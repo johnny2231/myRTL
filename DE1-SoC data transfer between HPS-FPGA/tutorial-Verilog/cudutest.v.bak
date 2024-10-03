@@ -1,0 +1,97 @@
+module DU (
+
+)
+
+always @(posedge CLOCK_50)
+begin
+	if(ldread == 1)
+	begin
+		hps_to_fpga_read <= 1'b1;
+	end
+	else
+	begin
+		hps_to_fpga_read <= hps_to_fpga_read;
+	end
+end
+///
+
+always @(posedge CLOCK_50)
+begin	
+	if(uldread == 1)
+	begin
+		hps_to_fpga_read <= 1'b0;
+	end
+	else
+	begin
+		hps_to_fpga_read <= hps_to_fpga_read;
+	end
+end
+///
+
+always @(posedge CLOCK_50)
+begin
+	if (ld == 1 )
+	begin
+		memo[0] <= hps_to_fpga_readdata;
+	end
+end
+///
+///
+
+module CU (
+
+)
+
+always @(posedge CLOCK_50)
+begin
+	y <= Y;
+end
+///
+
+always @(y, hps_to_fpga_read, data_buffer_valid, hps_to_fpga_out_csr_readdata[1])
+begin
+	CV = 0;
+	Processing_state = 0;
+	
+	case (y)
+	s0:begin
+			if((!(hps_to_fpga_out_csr_readdata[1])) && (!data_buffer_valid))
+			begin
+				Y = s1;
+			end
+			else
+			begin
+				Y = s0;
+			end
+		end
+		
+	s1:begin
+			Y = s2;
+			ldread = 1;
+		end
+		
+	s2:begin
+			uldread = 0;
+			if (hps_to_fpga_read == 0)
+			begin
+				Y = s3;
+			end
+			else
+			begin
+				Y = s2;
+			end
+		end
+		
+	s3:begin
+			ld = 1;
+			Processing_state = 1;
+			Y = s4;
+		end
+		
+	s4:begin
+			Y = s0;
+		end
+	endcase
+end
+///
+

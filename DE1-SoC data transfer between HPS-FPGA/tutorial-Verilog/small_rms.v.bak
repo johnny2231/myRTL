@@ -1,0 +1,74 @@
+module small_rms (
+
+input clk,
+input [27:0] data,
+output [55:0] additioncheck, inputforsqrtcheck, 
+output [27:0] rms, dataincheck
+
+);
+
+parameter sample = 3;
+
+integer count;
+wire [27:0] b;
+reg [63:0] c;
+wire [55:0] product, e;
+reg [55:0] d;
+
+assign dataincheck = b;
+assign additioncheck = c;
+assign inputforsqrtcheck = d;
+assign b = data;
+
+always @(posedge clk)
+begin
+	
+	c <= c + product;
+
+	count <= count + 1;
+
+	
+	if (count == sample)
+	begin
+		count <= 0;
+		c <= 0;
+		d <= e;
+	end
+end
+//
+
+
+
+mult #(28, 28) Mult (
+
+.A(b),
+.B(b),
+.TC(1'b1),
+.PRODUCT(product)
+
+);
+
+//
+
+div #(64, 15, 0, 0) Div (
+
+.a(c),
+.b(15'd3),
+.quotient(e),
+.remainder(),
+.divide_by_0()
+
+);
+//
+
+sqrt #(56, 0) Sqrt (
+
+.a(d),
+.root(rms)
+
+);
+
+//
+
+endmodule
+

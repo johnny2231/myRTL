@@ -1,0 +1,22 @@
+module the_adder (indicator, thereset a, c);
+
+input indicator, thereset;
+input [15:0] a;
+output reg [15:0] c;
+
+always @(negedge indicator)
+begin
+	if (thereset)
+	begin
+		b <= 0;
+	end
+	
+	else
+	begin
+		b <= a + 1;
+	end
+end
+endmodule
+//
+
+	
